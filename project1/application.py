@@ -39,61 +39,29 @@ def login():
     password = request.from.get("Password")
     db.execute("INSERT INTO users(email, password) VALUES(:email, :password)", {"email" :email, "password" :generate_password_hash(password)})
     db.commit
-    return render_template("login.html", message ="Successfully loged in")
+    return render_template("login.html", message ="Successfully logged in")
       
                   
-#Logout
+# Logout
 @app.route("/logout")
 def logout():
-    
-          
-
-#Search
-  @app.route("/flights")
-  def flights():
-      flights = db.execute("SELECT * FROM flights").fetchall()
-      return render_template("flights.html", flights=flights)
-
-           
-           
-@app.route("/")
-  def index():
-      flights = db.execute("SELECT * FROM flights").fetchall()
-      return render_template("index.html", flights=flights)
-
-@app.route("/book", methods=["POST"])
-def book():
-      # Get form information.
-      name = request.form.get("name")
-      try:
-          flight_id = int(request.form.get("flight_id"))
-      except ValueError:
-          return render_template("error.html", message="Invalid flight number.")
-
-      # Make sure the flight exists.
-      if db.execute("SELECT * FROM flights WHERE id = :id", {"id": flight_id}).rowcount == 0:
-          return render_template("error.html", message="No such flight with that id.")
-      db.execute("INSERT INTO passengers (name, flight_id) VALUES (:name, :flight_id)",
-              {"name": name, "flight_id": flight_id})
-      db.commit()
-      return render_template("success.html")
-           
-  @app.route("/flights/<int:flight_id>")
-  def flight(flight_id):
-      # Make sure flight exists.
-      flight = db.execute("SELECT * FROM flights WHERE id = :id", {"id": flight_id}).fetchone()
-      if flight is None:
-          return render_template("error.html", message="No such flight.")
-
-      # Get all passengers.
-      passengers = db.execute("SELECT name FROM passengers WHERE flight_id = :flight_id",
-                              {"flight_id": flight_id}).fetchall()
-      return render_template("flight.html", flight=flight, passengers=passengers)
-
-           
-           
-           
-#Book page
+ 
+# Search
+@app.route("/booklist", method=["POST"])
+def booklist():
+    if "user_email" not in session:
+        return render_template("login.html", message="Login first")
+        
+    book_column = request.form.get("Book_column")
+    query = request.form.get("Query")              
+        
+    if book_column == "year":
+        book_list = db.execute("SELECT * FROM books WHERE year =:query", {"query" :query}.fetchall()              
+    else:
+        book_list = db.execute("SELECT * FROM books WHERE                        
+                               
+                               
+# Book page
 @app.route("/detail/<int:book_id>", methods=["GET","POST"])
 def detail(book_id):
     if "user_email" not in session:
@@ -146,7 +114,16 @@ def api(ISBN):
 if__name__=="__main__":
     app.run(debug=TRUE)
     
-
+# Process json data
 import requests
 res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"key": "Sii3jAsM7OI56b4UFhCCw", "isbns": "9781632168146"})
-print(res.json())
+
+rating_count = res["rating_count"]
+average_rating = res["average_rating"]
+reviews = db.execute("SELECT * FROM reviews WHERE book_id =:book_id", {"book_id" :book_id})fetchall()
+users = []
+for review in reviews:
+    email = db.execute("SELECT email FROM users WHERE id =:user_id", {"user_id" :review.user_id}).fetchone()                   
+    users.append(email, review)
+
+return render_template("detail.html", book=book, users=users, rating=rating, ratings_count=ratings_count, average_rating=average_rating, user_email=session["user_email"])                  
