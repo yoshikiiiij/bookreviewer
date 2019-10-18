@@ -33,7 +33,7 @@ def login():
     email = request.get.form("Email")
     
     # Make sure the user with the email does not exist
-    if db.execute("SELECT id FROM users WHERE email = :email", {"email": email}.fetchone() is not None:
+    if db.execute("SELECT id FROM users WHERE email = :email", {"email" :email}.fetchone() is not None:
         return render_template("error.html", message = "The email is already registered")
     
     password = request.from.get("Password")
