@@ -44,6 +44,8 @@ def login():
                   
 #Logout
 @app.route("/logout")
+def logout():
+    
           
 
 #Search
@@ -91,10 +93,27 @@ def book():
            
            
            
-#Book pag
-
-#Review subimission
-
+#Book page
+@app.route("/detail/<int:book_id>", methods=["GET","POST"])
+def detail(book_id):
+    if "user_email" not in session:
+        return render_template("login.html", message="Login first")
+    
+    book = db.execute("SELECT * FROM books WHERE id = :book_id", {"book_id" :book_id}).fetchone()
+    if book is None:
+        return render_template("error.html", message = "No book with that id")
+                  
+    #Review subimission
+    if request.method == "POST":
+        user_id = session["user_id"]
+        rating = request.form.get("Rating")
+        comment = request.form.get("Comment")
+    if db.execute("SELECT id FROM reviews WHERE user_id =:user_id AND book_id =;book_id",{"user_id" :user_id, "book_id" :book_id}==None:
+        db.execute("INSERT INTO reviews(user_id, book_id, rating, comment) VALUES(:user_id, :book_id, :rating, :comment)"{"user_id" :user_id, "book_id" :book_id, "rating" :rating, "comment" :comment})
+    else:
+        db.execute("UPDATAE reviews SET comment =:comment, rating =:rating WHERE user_id =:user_id AND book_id =;book_id",{"comment" :comment, "rating" :rating, "user_id" :user_id, "book_id" :book_id}=           
+    db.commit
+                   
 #Goodreads review
 
 #API access
